@@ -72,7 +72,7 @@ class PatreonAuthPlugin extends BasePlugin
 			'patreonRewardTitle'			=> array(AttributeType::String, 'required' => true),
 			'patreonWaitOneMonth'			=> array(AttributeType::Bool),
 			'patreonUrlWhenUserHasToWait'	=> array(AttributeType::String),
-			'patreonUrlWhenNoPledge'		=> array(AttributeType::String, 'required' => true),
+			'patreonUrlWhenNoPledge'		=> array(AttributeType::String),
 		);
 	}
 }
