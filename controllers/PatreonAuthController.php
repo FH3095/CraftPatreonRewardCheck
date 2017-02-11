@@ -106,7 +106,7 @@ class PatreonAuthController extends BaseController
 		$redirectTo=$default;
 		if(!empty($forceTarget))
 		{
-			$default=$forceTarget;
+			$redirectTo=$forceTarget;
 		}
 		else if(craft()->userSession->hasState('patreonAuth_startUrl'))
 		{
