@@ -1,0 +1,72 @@
+{% import "_includes/forms" as forms %}
+
+{{ forms.textField({
+	label:        "Patreon Client Id"|t,
+	required:     true,
+	id:           'patreonClientId',
+	name:         'patreonClientId',
+	value:        settings.patreonClientId,
+	autofocus:    true,
+}) }}
+
+{{ forms.textField({
+	label:        "Patreon Client Secret"|t,
+	required:     true,
+	id:           'patreonClientSecret',
+	name:         'patreonClientSecret',
+	value:        settings.patreonClientSecret,
+}) }}
+
+{{ forms.textField({
+	label:        "Patreon Creator Id"|t,
+	required:     true,
+	id:           'patreonCreatorId',
+	name:         'patreonCreatorId',
+	instructions: ""|t,
+	value:        settings.patreonCreatorId,
+}) }}
+
+{{ forms.textField({
+	label:        "URL for auth end point"|t,
+	required:     true,
+	id:           'patreonUrlAuthEnd',
+	name:         'patreonUrlAuthEnd',
+	instructions: ""|t,
+	value:        settings.patreonUrlAuthEnd,
+}) }}
+
+{{ forms.textField({
+	label:        "Patreon Reward title"|t,
+	required:     true,
+	id:           'patreonRewardTitle',
+	name:         'patreonRewardTitle',
+	instructions: ""|t,
+	value:        settings.patreonRewardTitle,
+}) }}
+
+{{ forms.checkbox({
+	label:        "Wait till next month after pledge"|t,
+	required:     false,
+	id:           'patreonWaitOneMonth',
+	name:         'patreonWaitOneMonth',
+	instructions: ""|t,
+	checked:        settings.patreonWaitOneMonth,
+}) }}
+
+{{ forms.textField({
+	label:        "URL to redirect when user hasn't pledged"|t,
+	required:     true,
+	id:           'patreonUrlWhenNoPledge',
+	name:         'patreonUrlWhenNoPledge',
+	instructions: ""|t,
+	value:        settings.patreonUrlWhenNoPledge,
+}) }}
+
+{{ forms.textField({
+	label:        "URL to redirect to when user has to wait for next month"|t,
+	required:     false,
+	id:           'patreonUrlWhenUserHasToWait',
+	name:         'patreonUrlWhenUserHasToWait',
+	instructions: ""|t,
+	value:        settings.patreonUrlWhenUserHasToWait,
+}) }}
