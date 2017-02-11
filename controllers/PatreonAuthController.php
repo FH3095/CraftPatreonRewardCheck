@@ -98,9 +98,9 @@ class PatreonAuthController extends BaseController
 				return;
 			}
 		}
-		
+
 		// Work done. Set the session variable and finish!
-		craft()->userSession->setState('patreonAuth_userHasValidPledge',1);
+		craft()->userSession->setState('patreonAuth_userHasValidPledge', 1);
 		$redirectTo = '/';
 		if(craft()->userSession->hasState('patreonAuth_finishUrl'))
 		{
