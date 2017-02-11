@@ -30,7 +30,7 @@ class PatreonAuthController extends BaseController
 		$tokens = $oauthClient->get_tokens(craft()->request->getParam('code'), $settings->patreonUrlAuthEnd);
 		if(isset($tokens['error']) && !empty($tokens['error']))
 		{
-			Craft::getLogger()->log('Auth failed for user from ' . $_SERVER['REMOTE_ADDR'] . ': ' . $tokens['error'], 'info', false, 'application', 'PatreonAuth');
+			Craft::getLogger()->log('Auth failed for user from ' . $_SERVER['REMOTE_ADDR'] . ': ' . $tokens['error'], 'trace', false, 'application', 'PatreonAuth');
 			$this->redirectToUrl();
 			craft()->end();
 			return;
