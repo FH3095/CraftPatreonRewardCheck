@@ -2,7 +2,7 @@
 namespace Craft;
 
 use Twig_Extension;
-use Twig_Filter_Method;
+use Twig_Function_Method;
 
 class PatreonAuthTwigExtension extends \Twig_Extension
 {
