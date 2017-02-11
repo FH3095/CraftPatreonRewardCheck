@@ -58,6 +58,11 @@ class PatreonAuthPlugin extends BasePlugin
 		));
 	}
 
+	public function addTwigExtension()
+	{
+		Craft::import('plugins.patreonauth.twigextensions.PatreonAuthTwigExtension');
+		return new PatreonAuthTwigExtension();
+	}
 
 	/**
 	 * @return array
