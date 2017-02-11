@@ -9,10 +9,10 @@ class PatreonAuthController extends BaseController
 
 	public function actionStartAuth()
 	{
-		$startUrl = craft()->request->getQuery('finishUrl', null);
+		$startUrl = craft()->request->getQuery('startUrl', null);
 		if(!empty($startUrl))
 		{
-			craft()->userSession->setState('patreonAuth_finishUrl', $startUrl);
+			craft()->userSession->setState('patreonAuth_startUrl', $startUrl);
 		}
 		$settings = craft()->plugins->getPlugin('patreonauth')->getSettings();
 		$this->redirect('https://www.patreon.com/oauth2/authorize?response_type=code&client_id='.
@@ -31,7 +31,7 @@ class PatreonAuthController extends BaseController
 		if(isset($tokens['error']) && !empty($tokens['error']))
 		{
 			Craft::getLogger()->log('Auth failed for user from ' . $_SERVER['REMOTE_ADDR'] . ': ' . $tokens['error'], 'info', false, 'application', 'PatreonAuth');
-			$this->redirect('/', true, 303);
+			$this->redirectToUrl();
 			craft()->end();
 			return;
 		}
@@ -47,7 +47,7 @@ class PatreonAuthController extends BaseController
 		{
 			// When "included" is not in response, user hasnt pledged us -> deny
 			Craft::getLogger()->log('User ' . $userName . ' from ' . $_SERVER['REMOTE_ADDR'] . ' authed but cant fetch pledge-data.', 'trace', false, 'application', 'PatreonAuth');
-			$this->redirect($settings->patreonUrlWhenNoPledge, true, 303);
+			$this->redirectToUrl($settings->patreonUrlWhenNoPledge);
 			craft()->end();
 			return;
 		}
@@ -70,7 +70,7 @@ class PatreonAuthController extends BaseController
 		if(null == $pledge || null == $reward)
 		{
 			Craft::getLogger()->log('Cant find pledge or reward for user ' . $userName . ' from ' . $_SERVER['REMOTE_ADDR'] . '. Pledge: ' . print_r($pledge, true) . "\n Reward: " . print_r($reward,true), 'trace', false, 'application', 'PatreonAuth');
-			$this->redirect('/', true, 303);
+			$this->redirectToUrl($settings->patreonUrlWhenNoPledge);
 			craft()->end();
 			return;
 		}
@@ -93,7 +93,7 @@ class PatreonAuthController extends BaseController
 			if($pledgeValidAfter->getTimestamp() >= $currentDate->getTimestamp())
 			{
 				Craft::getLogger()->log('User ' . $userName . ' from ' . $_SERVER['REMOTE_ADDR'] . ' has a valid pledge, but the next month is not started yet. currentDate=' . $currentDate->format('Y-m-d') . ' validAfter=' . $pledgeValidAfter->format('Y-m-d'), 'trace', false, 'application', 'PatreonAuth');
-				$this->redirect($settings->patreonUrlWhenUserHasToWait, true, 303);
+				$this->redirectToUrl($settings->patreonUrlWhenUserHasToWait);
 				craft()->end();
 				return;
 			}
@@ -101,10 +101,20 @@ class PatreonAuthController extends BaseController
 
 		// Work done. Set the session variable and finish!
 		craft()->userSession->setState('patreonAuth_userHasValidPledge', 1);
-		$redirectTo = '/';
-		if(craft()->userSession->hasState('patreonAuth_finishUrl'))
+		Craft::getLogger()->log('User ' . $userName . ' from ' . $_SERVER['REMOTE_ADDR'] . ' has a valid pledge. Session-State set.', 'trace', false, 'application', 'PatreonAuth');
+		$this->redirectToUrl();
+	}
+
+	private function redirectToUrl($forceTarget=null, $default='/')
+	{
+		$redirectTo=$default;
+		if(!empty($forceTarget))
 		{
-			$redirectTo=craft()->userSession->getState('patreonAuth_finishUrl');
+			$default=$forceTarget;
+		}
+		else if(craft()->userSession->hasState('patreonAuth_startUrl'))
+		{
+			$redirectTo=craft()->userSession->getState('patreonAuth_startUrl');
 		}
 		$this->redirect($redirectTo, true, 303);
 		craft()->end();
