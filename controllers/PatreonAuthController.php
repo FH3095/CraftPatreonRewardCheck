@@ -32,7 +32,6 @@ class PatreonAuthController extends BaseController
 		{
 			Craft::getLogger()->log('Auth failed for user from ' . $_SERVER['REMOTE_ADDR'] . ': ' . $tokens['error'], 'trace', false, 'application', 'PatreonAuth');
 			$this->redirectToUrl();
-			craft()->end();
 			return;
 		}
 		// Save tokens to session
@@ -48,7 +47,6 @@ class PatreonAuthController extends BaseController
 			// When "included" is not in response, user hasnt pledged us -> deny
 			Craft::getLogger()->log('User ' . $userName . ' from ' . $_SERVER['REMOTE_ADDR'] . ' authed but cant fetch pledge-data.', 'trace', false, 'application', 'PatreonAuth');
 			$this->redirectToUrl($settings->patreonUrlWhenNoPledge);
-			craft()->end();
 			return;
 		}
 		$included=$patreonResponse['included'];
@@ -71,7 +69,6 @@ class PatreonAuthController extends BaseController
 		{
 			Craft::getLogger()->log('Cant find pledge or reward for user ' . $userName . ' from ' . $_SERVER['REMOTE_ADDR'] . '. Pledge: ' . print_r($pledge, true) . "\n Reward: " . print_r($reward,true), 'trace', false, 'application', 'PatreonAuth');
 			$this->redirectToUrl($settings->patreonUrlWhenNoPledge);
-			craft()->end();
 			return;
 		}
 
@@ -94,7 +91,6 @@ class PatreonAuthController extends BaseController
 			{
 				Craft::getLogger()->log('User ' . $userName . ' from ' . $_SERVER['REMOTE_ADDR'] . ' has a valid pledge, but the next month is not started yet. currentDate=' . $currentDate->format('Y-m-d') . ' validAfter=' . $pledgeValidAfter->format('Y-m-d'), 'trace', false, 'application', 'PatreonAuth');
 				$this->redirectToUrl($settings->patreonUrlWhenUserHasToWait);
-				craft()->end();
 				return;
 			}
 		}
