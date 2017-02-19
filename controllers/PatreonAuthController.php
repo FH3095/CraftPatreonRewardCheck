@@ -96,6 +96,7 @@ class PatreonAuthController extends BaseController
 		}
 
 		// Work done. Set the session variable and finish!
+		craft()->userSession->setState('patreonAuth_username', $userName);
 		craft()->userSession->setState('patreonAuth_userHasValidPledge', 1);
 		Craft::getLogger()->log('User ' . $userName . ' from ' . $_SERVER['REMOTE_ADDR'] . ' has a valid pledge. Session-State set.', 'trace', false, 'application', 'PatreonAuth');
 		$this->redirectToUrl();
