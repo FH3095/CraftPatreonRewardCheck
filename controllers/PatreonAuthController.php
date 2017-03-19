@@ -42,32 +42,31 @@ class PatreonAuthController extends BaseController
 		$apiClient = new \Patreon\API($tokens['access_token']);
 		$patreonResponse = $apiClient->fetch_user();
 		$userName=$patreonResponse['data']['attributes']['full_name'];
+		$userId=$patreonResponse['data']['id'];
+		$userImageUrl=$patreonResponse['data']['attributes']['image_url'];
+		$userThumbUrl=$patreonResponse['data']['attributes']['thumb_url'];
 		if(!isset($patreonResponse['included']))
 		{
-			// When "included" is not in response, user hasnt pledged us -> deny
+			// When "included" is not in response, user hasnt pledged us
 			Craft::getLogger()->log('User ' . $userName . ' from ' . $_SERVER['REMOTE_ADDR'] . ' authed but cant fetch pledge-data.', 'trace', false, 'application', 'PatreonAuth');
+			$this->setSessionVariables($userName,$userId,$userImageUrl,$userThumbUrl);
 			$this->redirectToUrl($settings->patreonUrlWhenNoPledge);
 			return;
 		}
 		$included=$patreonResponse['included'];
 
 		$pledge=null;
-		$reward=null;
 		foreach($included AS $obj)
 		{
 			if($obj['type'] == 'pledge' && intval($obj['relationships']['creator']['data']['id']) == intval($settings->patreonCreatorId))
 			{
 				$pledge = $obj;
 			}
-			else if($obj['type'] == 'reward' && intval($obj['relationships']['creator']['data']['id']) == intval($settings->patreonCreatorId) &&
-					isset($obj['attributes']['title']) && strcasecmp($obj['attributes']['title'],$settings->patreonRewardTitle)==0)
-			{
-				$reward = $obj;
-			}
 		}
-		if(null == $pledge || null == $reward)
+		if(null == $pledge)
 		{
-			Craft::getLogger()->log('Cant find pledge or reward for user ' . $userName . ' from ' . $_SERVER['REMOTE_ADDR'] . '. Pledge: ' . print_r($pledge, true) . "\n Reward: " . print_r($reward,true), 'trace', false, 'application', 'PatreonAuth');
+			Craft::getLogger()->log('Cant find pledge for user ' . $userName . ' from ' . $_SERVER['REMOTE_ADDR'] . '. Pledge: ' . print_r($pledge, true), 'trace', false, 'application', 'PatreonAuth');
+			$this->setSessionVariables($userName,$userId,$userImageUrl,$userThumbUrl);
 			$this->redirectToUrl($settings->patreonUrlWhenNoPledge);
 			return;
 		}
@@ -89,19 +88,26 @@ class PatreonAuthController extends BaseController
 			//$pledgeValidAfter->sub(new \DateInterval('P0000-01-00T00:00:00'));
 			if($pledgeValidAfter->getTimestamp() >= $currentDate->getTimestamp())
 			{
-				Craft::getLogger()->log('User ' . $userName . ' from ' . $_SERVER['REMOTE_ADDR'] . ' has a valid pledge, but the next month is not started yet. currentDate=' . $currentDate->format('Y-m-d') . ' validAfter=' . $pledgeValidAfter->format('Y-m-d'), 'trace', false, 'application', 'PatreonAuth');
+				Craft::getLogger()->log('User ' . $userName . ' from ' . $_SERVER['REMOTE_ADDR'] . ' has a valid pledge ' . print_r($pledge, true) . ', but the next month is not started yet. currentDate=' . $currentDate->format('Y-m-d') . ' validAfter=' . $pledgeValidAfter->format('Y-m-d'), 'trace', false, 'application', 'PatreonAuth');
+				$this->setSessionVariables($userName,$userId,$userImageUrl,$userThumbUrl);
 				$this->redirectToUrl($settings->patreonUrlWhenUserHasToWait);
 				return;
 			}
 		}
 
 		// Work done. Set the session variable and finish!
-		craft()->userSession->setState('patreonAuth_username', $userName);
-		craft()->userSession->setState('patreonAuth_userHasValidPledge', 1);
-		craft()->userSession->setState('patreonAuth_imageUrl', $patreonResponse['data']['attributes']['image_url']);
-		craft()->userSession->setState('patreonAuth_thumbUrl', $patreonResponse['data']['attributes']['thumb_url']);
-		Craft::getLogger()->log('User ' . $userName . ' from ' . $_SERVER['REMOTE_ADDR'] . ' has a valid pledge. Session-State set.', 'trace', false, 'application', 'PatreonAuth');
+		$this->setSessionVariables($userName,$userId,$userImageUrl,$userThumbUrl,$pledge['attributes']['amount_cents']);
+		Craft::getLogger()->log('User ' . $userName . ' from ' . $_SERVER['REMOTE_ADDR'] . ' has a valid pledge. Amount: ' . $pledge['attributes']['amount_cents'] . ' Session-State set.', 'trace', false, 'application', 'PatreonAuth');
 		$this->redirectToUrl();
+	}
+
+	private function setSessionVariables($userName,$userId,$imageUrl,$thumbUrl,$pledgeAmount=0)
+	{
+		craft()->userSession->setState('patreonAuth_username', $userName);
+		craft()->userSession->setState('patreonAuth_userId', $userId);
+		craft()->userSession->setState('patreonAuth_imageUrl', $imageUrl);
+		craft()->userSession->setState('patreonAuth_thumbUrl', $thumbUrl);
+		craft()->userSession->setState('patreonAuth_pledgeAmount', $pledgeAmount);
 	}
 
 	private function redirectToUrl($forceTarget=null, $default='/')

@@ -74,7 +74,6 @@ class PatreonAuthPlugin extends BasePlugin
 			'patreonClientSecret'			=> array(AttributeType::String, 'required' => true),
 			'patreonCreatorId'				=> array(AttributeType::Number, 'required' => true),
 			'patreonUrlAuthEnd'				=> array(AttributeType::String, 'required' => true),
-			'patreonRewardTitle'			=> array(AttributeType::String, 'required' => true),
 			'patreonWaitOneMonth'			=> array(AttributeType::Bool),
 			'patreonUrlWhenUserHasToWait'	=> array(AttributeType::String),
 			'patreonUrlWhenNoPledge'		=> array(AttributeType::String),
