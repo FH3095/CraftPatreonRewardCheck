@@ -16,6 +16,7 @@ class PatreonAuthTwigExtension extends \Twig_Extension
 		return array(
 			'getSessionVariable' => new \Twig_Function_Method($this, 'getSessionVariable'),
 			'setSessionVariable' => new \Twig_Function_Method($this, 'setSessionVariable'),
+			'getCreatorID' => new \Twig_Function_Method($this, 'getCreatorID'),
 		);
 	}
 
@@ -31,5 +32,9 @@ class PatreonAuthTwigExtension extends \Twig_Extension
 	public function setSessionVariable($name, $value)
 	{
 		craft()->userSession->setState($name, $value);
+	}
+
+	public function getCreatorID(){
+		return craft()->plugins->getPlugin('patreonauth')->getSettings()->patreonCreatorId;
 	}
 }

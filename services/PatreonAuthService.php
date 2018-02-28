@@ -8,4 +8,7 @@ use \Patreon\OAuth;
 
 class PatreonAuthService extends BaseApplicationComponent
 {
+	public function getCreatorID(){
+		return craft()->plugins->getPlugin('patreonauth')->getSettings()->patreonCreatorId;
+	}
 }

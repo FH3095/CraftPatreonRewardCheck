@@ -108,6 +108,7 @@ class PatreonAuthController extends BaseController
 		craft()->userSession->setState('patreonAuth_imageUrl', $imageUrl);
 		craft()->userSession->setState('patreonAuth_thumbUrl', $thumbUrl);
 		craft()->userSession->setState('patreonAuth_pledgeAmount', $pledgeAmount);
+		craft()->userSession->setState('patreonAuth_userHasValidPledge', 1);
 	}
 
 	private function redirectToUrl($forceTarget=null, $default='/')
@@ -123,5 +124,9 @@ class PatreonAuthController extends BaseController
 		}
 		$this->redirect($redirectTo, true, 303);
 		craft()->end();
+	}
+
+	public function getCreatorID(){
+		return craft()->patreonAuth_PatreonAuthService->getCreatorID();
 	}
 }
