@@ -1,7 +1,7 @@
 <?php
 namespace Craft;
 
-require_once(craft()->path->getPluginsPath() . '/patreonauth/vendor/patreon-php/src/patreon.php');
+require_once(craft()->path->getPluginsPath() . 'patreonauth/vendor/autoload.php');
 
 class PatreonAuthController extends BaseController
 {
